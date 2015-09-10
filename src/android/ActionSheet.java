@@ -138,7 +138,7 @@ public class ActionSheet extends CordovaPlugin {
                 // view already defined, retrieve view holder
                 button = (ViewHolder) convertView.getTag();
               }
-              button.button.setEnabled(buttonMap.get(buttons[position]));
+              button.button.setEnabled(!buttonMap.get(buttons[position]));
               button.button.setText(buttons[position]);
               button.button.setTextSize(TypedValue.COMPLEX_UNIT_PX,28);
               button.button.setOnClickListener(new View.OnClickListener() {
