@@ -46,6 +46,7 @@
 		</config-file>
 		<source-file src="src/android/ActionSheet.java" target-dir="src/nl/xservices/plugins/actionsheet"/>
 		<source-file src="src/android/res/layout/file.xml" target-dir="res/layout"/>
+		<source-file src="src/android/res/color/color.xml" target-dir="res/color"/>
 	</platform>
 
   <!-- wp8 -->
