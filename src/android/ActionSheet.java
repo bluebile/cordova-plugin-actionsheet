@@ -1,10 +1,21 @@
 package nl.xservices.plugins.actionsheet;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.res.Resources;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.TextView;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -15,14 +26,20 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Iterator;
+
+import br.gov.fnde.educacao.R;
 
 /**
  * @author Original excellent PR by: Brill Pappin
- * @author Mantainer of the code: Eddy Verbruggen
+ * @author Mantido pela MBA.
  */
 public class ActionSheet extends CordovaPlugin {
 
   private AlertDialog dialog;
+  private HashMap<String,Boolean[]> buttonMap = new HashMap<String,Boolean[]>();
 
   public ActionSheet() {
     super();
@@ -82,68 +99,71 @@ public class ActionSheet extends CordovaPlugin {
             .setTitle(title)
             .setCancelable(true);
 
-
-        // Although there is not really anything technically wrong
-        // with adding a cancel button, Android typically doesn't use
-        // one for this kind of list dialog.
-        // We'll allow the user to override the "smart" option and
-        // include it if they insist anyway.
-
         if (androidEnableCancelButton && !TextUtils.isEmpty(addCancelButtonWithLabel)) {
           builder.setNegativeButton(addCancelButtonWithLabel,
               new OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                   dialog.cancel();
-                  // We catch the cancel event and return
-                  // the index then.
                 }
               });
         }
-
-        // So what do we do with the iOS destructive button?
-        // Android doesn't really have the concept, so we're going to
-        // ignore it until we have a situation where we can come up with
-        // a good way to implement it. Most likely adding an image
-        // or some other indicator.
-//        if (!TextUtils.isEmpty(addDestructiveButtonWithLabel)) {
-//          builder.setPositiveButton(addDestructiveButtonWithLabel,
-//              new OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                  dialog.dismiss();
-//                  callbackContext
-//                      .sendPluginResult(new PluginResult(
-//                          PluginResult.Status.OK, 0));
-//                }
-//              });
-//        }
 
         final String[] buttons = getStringArray(
             buttonLabels,
             (TextUtils.isEmpty(addDestructiveButtonWithLabel) ? null
                 : addDestructiveButtonWithLabel));
 
-        builder.setItems(buttons, new OnClickListener() {
+        final ListAdapter adapter = new ArrayAdapter(
+                cordova.getActivity(), R.layout.file, buttons) {
+          ViewHolder button;
+          class ViewHolder {
+            Button button;
+          }
+            public View getView(int position, View convertView,
+                                ViewGroup parent) {
+              final LayoutInflater inflater = (LayoutInflater) cordova.getActivity().getApplicationContext()
+                      .getSystemService(
+                              Context.LAYOUT_INFLATER_SERVICE);
+              final int wich = position;
+              if (convertView == null) {
+                convertView = inflater.inflate(
+                        R.layout.file, null);
+
+                button = new ViewHolder();
+                button.button = (Button) convertView
+                        .findViewById(R.id.button);
+                convertView.setTag(button);
+              } else {
+                // view already defined, retrieve view holder
+                button = (ViewHolder) convertView.getTag();
+              }
+
+              button.button.setText(buttons[position]);
+              button.button.setTextSize(TypedValue.COMPLEX_UNIT_PX,28);
+              button.button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                  callbackContext.sendPluginResult(new PluginResult(
+                          PluginResult.Status.OK, wich + 1));
+                }
+              });
+
+              return convertView;
+            }
+          };
+
+        builder.setAdapter(adapter, new OnClickListener() {
           @Override
           public void onClick(DialogInterface dialog, int which) {
-            // java 0 based index converted to cordova 1 based
-            // index, so we don't confuse the webbies.
-            callbackContext.sendPluginResult(new PluginResult(
-                PluginResult.Status.OK, which + 1));
           }
         });
 
         builder.setOnCancelListener(new AlertDialog.OnCancelListener() {
           public void onCancel(DialogInterface dialog) {
-            // Match the way the iOS plugin works. Cancel is
-            // always the last index and destructive is always the
-            // first, if it exists. Even though we don't handle the
-            // destructive button, we want the selected index to
-            // match.
             int cancelButtonIndex = buttons.length + 1;
             callbackContext.sendPluginResult(new PluginResult(
-                PluginResult.Status.OK, cancelButtonIndex));
+                    PluginResult.Status.OK, cancelButtonIndex));
           }
         });
 
@@ -164,14 +184,29 @@ public class ActionSheet extends CordovaPlugin {
         btn.add(aPrepend);
       }
     }
-
-    // add the rest of the buttons from the list.
+    Boolean disabled = false;
+    Boolean hidden = false;
+    String text = "";
     if (jsonArray != null) {
-      for (int i = 0; i < jsonArray.length(); i++) {
-        btn.add(jsonArray.optString(i));
+      for(int i=0; i<jsonArray.length(); i++) {
+        try {
+          JSONObject obj = jsonArray.getJSONObject(i);
+          text = obj.optString("text");
+          disabled = obj.optBoolean("disabled");
+          hidden = obj.optBoolean("hidden");
+          if (hidden) {
+            continue;
+          }
+          btn.add(text);
+        } catch (org.json.JSONException e) {
+          //continuar
+        }
+        buttonMap.put(text, new Boolean[] { disabled, hidden });
+        disabled = false;
+        hidden = false;
       }
-
     }
+
     return btn.toArray(new String[btn.size()]);
   }
 }
