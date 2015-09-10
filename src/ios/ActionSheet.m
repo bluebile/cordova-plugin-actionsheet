@@ -34,7 +34,9 @@ UIActionSheet *actionSheet;
                                          otherButtonTitles:nil];
   
         for(int i = 0; i < [buttons count]; i++) {
-            [actionSheet addButtonWithTitle:[buttons objectAtIndex:i]];
+            if ([[[[buttons valueForKey:@"disabled"] allObjects]objectAtIndex:i] boolValue] == false) {
+                [actionSheet addButtonWithTitle:[[[buttons valueForKey:@"text"] allObjects]objectAtIndex:i]];
+            }
         }
   
         if (addCancelButtonWithLabel != nil) {
