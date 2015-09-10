@@ -39,7 +39,7 @@ import br.gov.fnde.educacao.R;
 public class ActionSheet extends CordovaPlugin {
 
   private AlertDialog dialog;
-  private HashMap<String,Boolean[]> buttonMap = new HashMap<String,Boolean[]>();
+  private HashMap<String,Boolean> buttonMap = new HashMap<String,Boolean>();
 
   public ActionSheet() {
     super();
@@ -138,7 +138,7 @@ public class ActionSheet extends CordovaPlugin {
                 // view already defined, retrieve view holder
                 button = (ViewHolder) convertView.getTag();
               }
-
+              button.button.setEnabled(buttonMap.get(buttons[position]));
               button.button.setText(buttons[position]);
               button.button.setTextSize(TypedValue.COMPLEX_UNIT_PX,28);
               button.button.setOnClickListener(new View.OnClickListener() {
@@ -201,9 +201,8 @@ public class ActionSheet extends CordovaPlugin {
         } catch (org.json.JSONException e) {
           //continuar
         }
-        buttonMap.put(text, new Boolean[] { disabled, hidden });
+        buttonMap.put(text,disabled);
         disabled = false;
-        hidden = false;
       }
     }
 
