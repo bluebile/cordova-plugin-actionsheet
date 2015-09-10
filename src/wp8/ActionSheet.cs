@@ -13,6 +13,12 @@ using WPCordovaClassLib;
 
 namespace Cordova.Extension.Commands
 {
+    public class ButtonClass
+    {
+        public string text { get; set; }
+        public bool didsabled { get; set; }
+    }
+    
     public class ActionSheet : BaseCommand
     {
 
@@ -20,7 +26,7 @@ namespace Cordova.Extension.Commands
         public class ActionSheetOptions
         {
             [DataMember(IsRequired = false, Name = "buttonLabels")]
-            public string[] buttonLabels { get; set; }
+            public ButtonClass[] buttonLabels { get; set; }
 
             [DataMember(IsRequired = false, Name = "title")]
             public string title { get; set; }
@@ -109,17 +115,19 @@ namespace Cordova.Extension.Commands
                 // regular buttons
                 if (actionSheetOptions.buttonLabels != null)
                 {
-                    foreach (String buttonLabel in actionSheetOptions.buttonLabels)
+                    foreach (ButtonClass buttonLabel in actionSheetOptions.buttonLabels)
                     {
-                        Button button = new Button();
-                        button.TabIndex = buttonIndex++;
-                        button.Content = buttonLabel;
-                        button.Background = darkBrush;
-                        button.Foreground = new SolidColorBrush(Colors.White);
-                        button.Padding = new Thickness(10);
-                        button.Margin = new Thickness(5);
-                        button.Click += new RoutedEventHandler(buttonClickListener);
-                        panel.Children.Add(button);
+                        if (buttonLabel.disabled == false) {
+                            Button button = new Button();
+                            button.TabIndex = buttonIndex++;
+                            button.Content = buttonLabel.text;
+                            button.Background = darkBrush;
+                            button.Foreground = new SolidColorBrush(Colors.White);
+                            button.Padding = new Thickness(10);
+                            button.Margin = new Thickness(5);
+                            button.Click += new RoutedEventHandler(buttonClickListener);
+                            panel.Children.Add(button);    
+                        }
                     }
                 }
 
