@@ -16,7 +16,7 @@ namespace Cordova.Extension.Commands
     public class ButtonClass
     {
         public string text { get; set; }
-        public bool didsabled { get; set; }
+        public bool disabled { get; set; }
     }
     
     public class ActionSheet : BaseCommand
