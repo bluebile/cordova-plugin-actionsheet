@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Iterator;R
+import java.util.Iterator;
 
 /**
  * @author Original excellent PR by: Brill Pappin
