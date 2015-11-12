@@ -28,9 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Iterator;
-
-import br.gov.fnde.educacao.R;
+import java.util.Iterator;R
 
 /**
  * @author Original excellent PR by: Brill Pappin
@@ -115,7 +113,7 @@ public class ActionSheet extends CordovaPlugin {
                 : addDestructiveButtonWithLabel));
 
         final ListAdapter adapter = new ArrayAdapter(
-                cordova.getActivity(), R.layout.file, buttons) {
+                cordova.getActivity(), android.R.layout.file, buttons) {
           ViewHolder button;
           class ViewHolder {
             Button button;
@@ -128,11 +126,11 @@ public class ActionSheet extends CordovaPlugin {
               final int wich = position;
               if (convertView == null) {
                 convertView = inflater.inflate(
-                        R.layout.file, null);
+                        android.R.layout.file, null);
 
                 button = new ViewHolder();
                 button.button = (Button) convertView
-                        .findViewById(R.id.button);
+                        .findViewById(android.R.layout.id.button);
                 convertView.setTag(button);
               } else {
                 // view already defined, retrieve view holder
