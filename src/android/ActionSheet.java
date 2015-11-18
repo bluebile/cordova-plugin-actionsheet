@@ -24,6 +24,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -38,7 +39,8 @@ public class ActionSheet extends CordovaPlugin {
 
   private AlertDialog dialog;
   private HashMap<String,Boolean> buttonMap = new HashMap<String,Boolean>();
-
+  private static Field rClassLayout = null;
+  private static Field rClassId = null;
   public ActionSheet() {
     super();
   }
@@ -83,6 +85,9 @@ public class ActionSheet extends CordovaPlugin {
 
     final CordovaInterface cordova = this.cordova;
 
+    final int fileLayout = findRClass(cordova, "file");
+    final int idLayout = findRClass(cordova, "id");
+
     Runnable runnable = new Runnable() {
       public void run() {
 
@@ -113,7 +118,7 @@ public class ActionSheet extends CordovaPlugin {
                 : addDestructiveButtonWithLabel));
 
         final ListAdapter adapter = new ArrayAdapter(
-                cordova.getActivity(), android.R.layout.file, buttons) {
+                cordova.getActivity(), fileLayout, buttons) {
           ViewHolder button;
           class ViewHolder {
             Button button;
@@ -124,13 +129,15 @@ public class ActionSheet extends CordovaPlugin {
                       .getSystemService(
                               Context.LAYOUT_INFLATER_SERVICE);
               final int wich = position;
+
               if (convertView == null) {
+
                 convertView = inflater.inflate(
-                        android.R.layout.file, null);
+                        fileLayout, null);
 
                 button = new ViewHolder();
                 button.button = (Button) convertView
-                        .findViewById(android.R.layout.id.button);
+                        .findViewById(idLayout);
                 convertView.setTag(button);
               } else {
                 // view already defined, retrieve view holder
@@ -170,6 +177,47 @@ public class ActionSheet extends CordovaPlugin {
       }
     };
     this.cordova.getActivity().runOnUiThread(runnable);
+  }
+
+  private static Integer findRClass(CordovaInterface cordova, String tag) {
+    try {
+      if (rClassLayout != null && rClassId != null) {
+        if (tag == "file") {
+          return rClassLayout.getInt(null);
+        } else {
+          return rClassId.getInt("button");
+        }
+      }
+      Class c = Class.forName(cordova.getActivity().getPackageName() + "R");
+      Class[] innerClasses = c.getClasses();
+      Class layoutClass = null;
+      Class idClass = null;
+
+      for (int i = 0; i < innerClasses.length; i++) {
+        if (innerClasses[i].getSimpleName()
+                .equals("layout")){
+          layoutClass = innerClasses[i];
+        } else if (innerClasses[i].getSimpleName()
+                .equals("id")){
+          idClass = innerClasses[i];
+        }
+      }
+      rClassLayout = layoutClass.getField("file");
+      rClassId = idClass.getField("id");
+      if (tag == "file") {
+        return rClassLayout.getInt(null);
+      } else {
+        return rClassId.getInt(null);
+      }
+
+    } catch (ClassNotFoundException cnfe) {
+      cnfe.printStackTrace();
+    } catch (NoSuchFieldException nsfe) {
+      nsfe.printStackTrace();
+    } catch (IllegalAccessException iae) {
+      iae.printStackTrace();
+    }
+    return null;
   }
 
   private String[] getStringArray(JSONArray jsonArray, String... prepend) {
