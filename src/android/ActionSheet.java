@@ -86,7 +86,7 @@ public class ActionSheet extends CordovaPlugin {
     final CordovaInterface cordova = this.cordova;
 
     final int fileLayout = findRClass(cordova, "file");
-    final int idLayout = findRClass(cordova, "id");
+    final int idLayout = findRClass(cordova, "button");
 
     Runnable runnable = new Runnable() {
       public void run() {
@@ -185,10 +185,10 @@ public class ActionSheet extends CordovaPlugin {
         if (tag == "file") {
           return rClassLayout.getInt(null);
         } else {
-          return rClassId.getInt("button");
+          return rClassId.getInt(null);
         }
       }
-      Class c = Class.forName(cordova.getActivity().getPackageName() + "R");
+      Class c = Class.forName(cordova.getActivity().getPackageName() + ".R");
       Class[] innerClasses = c.getClasses();
       Class layoutClass = null;
       Class idClass = null;
@@ -203,7 +203,7 @@ public class ActionSheet extends CordovaPlugin {
         }
       }
       rClassLayout = layoutClass.getField("file");
-      rClassId = idClass.getField("id");
+      rClassId = idClass.getField("button");
       if (tag == "file") {
         return rClassLayout.getInt(null);
       } else {
