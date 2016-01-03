@@ -179,7 +179,7 @@ namespace Cordova.Extension.Commands
                 CordovaView cView = getCordovaView();
                 getCordovaView().Browser.Dispatcher.BeginInvoke(() =>
                 {
-                    cView.Browser.InvokeScript("execScript", "document.removeEventListener('backbutton', window.plugins.actionsheet.hide, false)");
+                    //cView.Browser.InvokeScript("execScript", "document.removeEventListener('backbutton', window.plugins.actionsheet.hide, false)");
                     cView.Browser.Opacity = 1d;
                 });
 
