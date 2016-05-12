@@ -162,9 +162,6 @@ namespace Cordova.Extension.Commands
 
         void buttonClickListener(object sender, RoutedEventArgs e)
         {
-            // Close the popup
-            //hide(null);
-            getCordovaView().Browser.InvokeScript("eval", 
             // Get the clicked button index
             Button button = (Button)sender;
             DispatchCommandResult(new PluginResult(PluginResult.Status.OK, button.TabIndex));
