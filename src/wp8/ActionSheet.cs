@@ -165,7 +165,6 @@ namespace Cordova.Extension.Commands
             // Close the popup
             //hide(null);
             getCordovaView().Browser.InvokeScript("eval", 
-            new string[] {"if (typeof botaoVoltarFn === 'function') {  botaoVoltarFn(); } else { window.plugins.actionsheet.hide(); }"});
             // Get the clicked button index
             Button button = (Button)sender;
             DispatchCommandResult(new PluginResult(PluginResult.Status.OK, button.TabIndex));
