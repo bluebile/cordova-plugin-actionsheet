@@ -144,7 +144,7 @@ namespace Cordova.Extension.Commands
                     button.Background = darkBrush;
                     button.Foreground = new SolidColorBrush(Colors.White);
 
-                    button.Click += new RoutedEventHandler(buttonClickListener);
+                    button.Click += new RoutedEventHandler(buttonBackClickListener);
                     panel.Children.Add(button);
 
                 }
@@ -165,6 +165,14 @@ namespace Cordova.Extension.Commands
             // Get the clicked button index
             Button button = (Button)sender;
             DispatchCommandResult(new PluginResult(PluginResult.Status.OK, button.TabIndex));
+        }
+        
+        void buttonBackClickListener(object sender, RoutedEventArgs e)
+        {
+            hide(null);
+            // Get the clicked button index
+            //Button button = (Button)sender;
+            //DispatchCommandResult(new PluginResult(PluginResult.Status.OK, button.TabIndex));
         }
 
         public void hide(string options)
